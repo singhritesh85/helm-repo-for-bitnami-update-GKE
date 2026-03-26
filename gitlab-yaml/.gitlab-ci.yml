@@ -15,7 +15,7 @@ deployment:
       sleep 5
 
       kubectl get namespace memcached --context=arn:aws:eks:us-east-2:027330342406:cluster/eks-demo-cluster-dev || kubectl create namespace memcached --context=arn:aws:eks:us-east-2:027330342406:cluster/eks-demo-cluster-dev
-      helm upgrade --install memcached bitnami/memcached/ -f bitnami/memcached/values.yaml --create-namespace --namespace memcached --set replicaCount=2,persistence.enabled=true,persistence.size=1Gi,containerPorts.memcached=11211,architecture=high-availability,service.clusterIP=None,service.ports.memcached=11211,global.storageClass=gp2 --set-string service.annotations."service\\.beta\\.kubernetes\\.io/aws-load-balancer-internal"="Internal" --kube-context=arn:aws:eks:us-east-2:027330342406:cluster/eks-demo-cluster-dev
+      helm upgrade --install memcached bitnami/memcached/ -f bitnami/memcached/values.yaml --create-namespace --namespace memcached --set replicaCount=2,persistence.enabled=true,persistence.size=1Gi,containerPorts.memcached=11211,architecture=high-availability,service.clusterIP=None,service.type=LoadBalancer,service.ports.memcached=11211,global.storageClass=gp2 --set-string service.annotations."service\\.beta\\.kubernetes\\.io/aws-load-balancer-internal"="Internal" --kube-context=arn:aws:eks:us-east-2:027330342406:cluster/eks-demo-cluster-dev
       kubectl get pods -n memcached --context=arn:aws:eks:us-east-2:027330342406:cluster/eks-demo-cluster-dev
       sleep 5
 
@@ -25,6 +25,6 @@ deployment:
         git clone https://dexter:$HELM_REPO_FOR_GKE_ACCESS_TOKEN@gitlab.singhritesh85.com/dexter/three-tier-webapplication-wildfly.git
         kubectl create configmap db-scheme --from-file=three-tier-webapplication-wildfly/src/main/resources/db_backup.sql -n mysql --context=multicloud-aks-cluster
       fi 
-      helm upgrade --install mysql bitnami/mysql/ -f bitnami/mysql/values.yaml --create-namespace --namespace mysql --set secondary.replicaCount=1,primary.persistence.enabled=true,primary.persistence.size=1Gi,architecture=replication,secondary.persistence.enabled=true,secondary.persistence.size=1Gi,global.storageClass=managed-csi,primary.service.type=ClusterIP,auth.rootPassword=Dexter@123,auth.database=accounts,initdbScriptsConfigMap=db-scheme --set-string service.annotations."service\\.beta\\.kubernetes\\.io/azure-load-balancer-internal"="true" --kube-context=multicloud-aks-cluster
+      helm upgrade --install mysql bitnami/mysql/ -f bitnami/mysql/values.yaml --create-namespace --namespace mysql --set secondary.replicaCount=1,primary.persistence.enabled=true,primary.persistence.size=1Gi,architecture=replication,secondary.persistence.enabled=true,secondary.persistence.size=1Gi,global.storageClass=managed-csi,primary.service.type=LoadBalancer,auth.rootPassword=Dexter@123,auth.database=accounts,initdbScriptsConfigMap=db-scheme --set-string primary.service.annotations."service\\.beta\\.kubernetes\\.io/azure-load-balancer-internal"="true" --kube-context=multicloud-aks-cluster
       kubectl get pods -n mysql --context=multicloud-aks-cluster
   when: manual
